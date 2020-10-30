@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <title>TKGi</title>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+    <div class="container">
+        <a class="navbar-brand" href="/">TKGi</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+            
+            {% if request.user.is_authenticated == False %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'oidc_authentication_init' %}">Log In</a>
+                </li>
+            {% endif %}
+            {% if request.user.is_authenticated == True %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'cluster' %}">Cluster</a>
+                </li>
+                <li class="nav-item">
+                      <form action="{% url 'oidc_logout' %}" method="post">
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-link" style="text-decoration: none" value="Log Out">
+                      </form>
+                </li>
+
+            {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container px-2">
+  {% if request.user.is_authenticated == True %}
+    {% block content %}{% endblock %}
+  {% else %}
+    <a>Please Log In</a>
+  {% endif %}
+</div>
+</body>
+</html>

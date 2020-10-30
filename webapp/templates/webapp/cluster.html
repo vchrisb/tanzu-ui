@@ -1,0 +1,40 @@
+{% extends 'webapp/base.html' %}
+{% block content %}
+    
+    <div class="row mx-2 float-right">
+      <div class="row">
+      <a href="{% url 'cluster_refresh' %}"><button type="button" class="btn btn-success"><i class="fas fa-sync"></i></button></a>
+      <a href="{% url 'cluster_create' %}"><button type="button" class="btn btn-info"><i class="fas fa-plus"></i></button></a>
+      </div>
+    </div>
+    {% if clusters %}
+    <div class="row mx-2">
+        <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">Cluster Name</th>
+            <th scope="col">Cluster ID</th>
+            <th scope="col">Last Action</th>
+            <th scope="col">Last State</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for cluster in clusters %}
+          <tr>
+            <td>{{cluster.name}}</td>
+            <th scope="row">{{cluster.uuid}}</th>
+            <td>{{cluster.last_action}}</td>
+            <td>{{cluster.last_action_state}}</td>
+            <td>
+              <a href="{% url 'cluster_kubeconfig' cluster.uuid %}" download><button type="button" class="btn btn-primary"><i class="fas fa-download"></i></button></a>
+              <a href="{% url 'cluster_delete' cluster.uuid %}" ><button type="button" class="btn btn-danger"><i class="far fa-trash-alt"></i></button></a>
+            </td>
+          </tr>
+        {% endfor %}
+        </table>
+    </div>
+    {% else %}
+    <p>No Cluster available.</p>
+    {% endif %}
+{% endblock %}

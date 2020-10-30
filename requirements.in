@@ -1,0 +1,5 @@
+django
+pyyaml
+django-crispy-forms
+mozilla_django_oidc
+requests_oauthlib
