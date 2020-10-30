@@ -12,19 +12,26 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 from django.urls import reverse_lazy
+import environ
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+# reading .env file
+env.read_env(os.path.join(BASE_DIR,  ".env"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '_ybtm$f&!#qbb9c+7p%o%%r_#sbh++gn_yhob+k_ouxu&$f17_'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = []
 
@@ -84,10 +91,7 @@ WSGI_APPLICATION = 'tkgi.wsgi.application'
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    'default': env.db(),
 }
 
 
@@ -134,20 +138,20 @@ LOGIN_URL = reverse_lazy('oidc_authentication_callback')
 
 OIDC_RP_SIGN_ALGO = 'RS256'
 
-OIDC_OP_JWKS_ENDPOINT = os.environ.get("OIDC_OP_JWKS_ENDPOINT")
-OIDC_RP_CLIENT_ID = os.environ.get("OIDC_RP_CLIENT_ID")
-OIDC_RP_CLIENT_SECRET = os.environ.get("OIDC_RP_CLIENT_SECRET")
-OIDC_OP_AUTHORIZATION_ENDPOINT = os.environ.get("OIDC_OP_AUTHORIZATION_ENDPOINT")
-OIDC_OP_TOKEN_ENDPOINT = os.environ.get("OIDC_OP_TOKEN_ENDPOINT")
-OIDC_OP_USER_ENDPOINT = os.environ.get("OIDC_OP_USER_ENDPOINT")
+OIDC_OP_JWKS_ENDPOINT = env('OIDC_OP_JWKS_ENDPOINT')
+OIDC_RP_CLIENT_ID = env('OIDC_RP_CLIENT_ID')
+OIDC_RP_CLIENT_SECRET = env('OIDC_RP_CLIENT_SECRET')
+OIDC_OP_AUTHORIZATION_ENDPOINT = env('OIDC_OP_AUTHORIZATION_ENDPOINT')
+OIDC_OP_TOKEN_ENDPOINT = env('OIDC_OP_TOKEN_ENDPOINT')
+OIDC_OP_USER_ENDPOINT = env('OIDC_OP_USER_ENDPOINT')
 
-LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
-TKGI_CLIENT_ID = os.environ.get("TKGI_CLIENT_ID")
-TKGI_CLIENT_SECRET = os.environ.get("TKGI_CLIENT_SECRET")
-TKGI_UAA_URL = os.environ.get("TKGI_UAA_URL")
-TKGI_API_URL = os.environ.get("TKGI_API_URL")
-TKGI_CA_CERT = os.environ.get("TKGI_CA_CERT")
+TKGI_CLIENT_ID = env('TKGI_CLIENT_ID')
+TKGI_CLIENT_SECRET = env('TKGI_CLIENT_SECRET')
+TKGI_UAA_URL = env('TKGI_UAA_URL')
+TKGI_API_URL = env('TKGI_API_URL')
+TKGI_CA_CERT = env('TKGI_CA_CERT')
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
