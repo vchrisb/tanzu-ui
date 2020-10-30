@@ -1,0 +1,96 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tkgi-ui
+  labels:
+    app: tkgi-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tkgi-ui
+  template:
+    metadata:
+      labels:
+        app: tkgi-ui
+    spec:
+      containers:
+      - name: tkgi-ui
+        image: vchrisb/tkgi-ui:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: POSTGRESQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: tkgi-postgresql
+              key: postgresql-password
+        - name: DATABASE_URL
+          value: postgres://postgres:$(POSTGRESQL_PASSWORD)@tkgi-postgresql-headless.default.svc.cluster.local:5432/postgres
+        - name: DEBUG
+          valueFrom:
+            secretKeyRef:
+              name: tkgi-ui-secret
+              key: DEBUG
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: tkgi-ui-secret
+              key: SECRET_KEY
+        - name: TKGI_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: tkgi-ui-secret
+              key: TKGI_CLIENT_ID
+        - name: TKGI_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: tkgi-ui-secret
+              key: TKGI_CLIENT_SECRET
+        - name: TKGI_UAA_URL
+          valueFrom:
+            secretKeyRef:
+              name: tkgi-ui-secret
+              key: TKGI_UAA_URL
+        - name: TKGI_API_URL
+          valueFrom:
+            secretKeyRef:
+              name: tkgi-ui-secret
+              key: TKGI_API_URL
+        - name: TKGI_CA_CERT
+          valueFrom:
+            secretKeyRef:
+              name: tkgi-ui-secret
+              key: TKGI_CA_CERT
+        - name: OIDC_OP_JWKS_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: tkgi-ui-secret
+              key: OIDC_OP_JWKS_ENDPOINT
+        - name: OIDC_RP_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: tkgi-ui-secret
+              key: OIDC_RP_CLIENT_ID
+        - name: OIDC_RP_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: tkgi-ui-secret
+              key: OIDC_RP_CLIENT_SECRET
+        - name: OIDC_OP_AUTHORIZATION_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: tkgi-ui-secret
+              key: OIDC_OP_AUTHORIZATION_ENDPOINT
+        - name: OIDC_OP_TOKEN_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: tkgi-ui-secret
+              key: OIDC_OP_TOKEN_ENDPOINT
+        - name: OIDC_OP_USER_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: tkgi-ui-secret
+              key: OIDC_OP_USER_ENDPOINT

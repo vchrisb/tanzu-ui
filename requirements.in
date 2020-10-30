@@ -4,3 +4,6 @@ django-crispy-forms
 mozilla_django_oidc
 requests_oauthlib
 django-environ
+whitenoise
+gunicorn
+psycopg2-binary

@@ -1,0 +1,8 @@
+extraEnv: |
+  - name: KEYCLOAK_USER
+    value: admin
+  - name: KEYCLOAK_PASSWORD
+    value: Passw0rd
+
+service:
+  type: LoadBalancer
