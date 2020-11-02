@@ -8,8 +8,10 @@ from django.views.generic.edit import CreateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.http import HttpResponse
-import yaml
 from .forms import ClusterForm
+import json
+import kubernetes
+from kubernetes.client.rest import ApiException
 
 def index(request):
     return render(request, 'webapp/index.html')
@@ -26,17 +28,77 @@ def cluster(request):
 def cluster_kubeconfig(request, pk=None):
     cluster = Cluster.objects.filter(owner=request.user).filter(uuid=pk).first()
     if(cluster):
-      oauth = get_request_object()
-      cluster_response = oauth.get("{}/v1/clusters/{}/binds/admin".format(settings.TKGI_API_URL, cluster.name))
-      if(cluster_response.status_code == 200):
-        response = HttpResponse(yaml.dump(cluster_response.json()), content_type='text/plain; charset=utf8')
+      if(create_cluster_role_binding(request.user.email, cluster)):
+        content = '''apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: {0}
+    server: https://{1}:{2}
+  name: {3}
+contexts:
+- context:
+    cluster: {3}
+    user: oidc
+  name: {3}
+current-context: test2
+kind: Config
+users:
+- name: oidc
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1beta1
+      args:
+      - oidc-login
+      - get-token
+      - --oidc-issuer-url={4}
+      - --oidc-client-id={5}
+      command: kubectl
+      env: null
+'''.format(settings.TKGI_CA_CERT, cluster.kubernetes_master_host, cluster.kubernetes_master_port, cluster.name, settings.OIDC_AUTH_ENDPOINT, settings.TKGI_CLUSTER_CLIENT_ID)
+        response = HttpResponse(content, content_type='text/plain; charset=utf8')
         response['Content-Disposition'] = 'attachment; filename="kubeconfig"'
         return response
       else:
-        print("binds not found")
+        print("error creating cluster role binding")
     else:
       print("not found")
     return redirect("cluster")
+
+def create_cluster_role_binding(email, cluster):
+    oauth = get_request_object()
+    cluster_response = oauth.get("{}/v1/clusters/{}/binds/admin".format(settings.TKGI_API_URL, cluster.name))
+    role_binding_name = email.replace('@','__') + '-cluster-admin'
+    if(cluster_response.status_code == 200):
+      kubeconfig = cluster_response.json()
+      kubernetes.config.load_kube_config_from_dict(kubeconfig)
+      with kubernetes.client.ApiClient() as api_client:
+        api_instance = kubernetes.client.RbacAuthorizationV1Api(api_client)
+        try:
+          field_selector = 'metadata.name={}'.format(role_binding_name)
+          existing_role_binding = api_instance.list_cluster_role_binding(field_selector=field_selector)  
+          if (len(existing_role_binding.items) == 0):
+            metadata = kubernetes.client.V1ObjectMeta(name=role_binding_name)
+            role_ref = kubernetes.client.V1RoleRef(api_group='rbac.authorization.k8s.io', kind='ClusterRole', name='cluster-admin')
+            subject = kubernetes.client.V1Subject(kind='User', name='steve@datev.de')
+            role_binding = kubernetes.client.V1RoleBinding(metadata=metadata, role_ref=role_ref, subjects=[subject])
+            api_response = api_instance.create_cluster_role_binding(body=role_binding)
+            print('Cluster Role Binding {} created!'.format(role_binding_name))
+          else:
+            print('Cluster Role Binding {} does exist!'.format(role_binding_name))
+        except ApiException as e:
+          print("Exception when calling RbacAuthorizationV1Api: %s\n" % e)
+          
+        # clean TKGi role_binding
+        try:
+          tkgi_role_binding_name = 'pks:{}-cluster-admin'.format(kubeconfig['users'][0]['name'])
+          api_response = api_instance.delete_cluster_role_binding(tkgi_role_binding_name)
+          print("Deleted TKGi role binding {}".format(tkgi_role_binding_name))
+        except ApiException as e:
+          print("Exception when calling RbacAuthorizationV1Api->delete_cluster_role_binding: %s\n" % e)
+          return False
+      return True
+    else:
+      return False
 
 @login_required
 def cluster_refresh(request):
@@ -99,7 +161,8 @@ class ClusterCreate(LoginRequiredMixin, CreateView):
             'kubernetes_master_host': "{}.cluster.pks.colton.cf-app.com".format(form.instance.name),
             'kubernetes_master_port': 8443
           },
-          'plan_name': 'small'
+          'plan_name': 'small',
+          'kubernetes_profile_name': 'oidc-config',
         }
         cluster_response = oauth.post("{}/v1/clusters".format(settings.TKGI_API_URL, ),json=content)
         if(cluster_response.status_code == 202):

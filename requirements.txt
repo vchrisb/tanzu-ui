@@ -5,28 +5,36 @@
 #    pip-compile --output-file=requirements.txt requirements.in
 #
 asgiref==3.2.10           # via django
-certifi==2020.6.20        # via requests
+cachetools==4.1.1         # via google-auth
+certifi==2020.6.20        # via kubernetes, requests
 cffi==1.14.3              # via cryptography
 chardet==3.0.4            # via requests
 cryptography==3.2.1       # via josepy, mozilla-django-oidc, pyopenssl
 django-crispy-forms==1.9.2  # via -r requirements.in
 django-environ==0.4.5     # via -r requirements.in
 django==3.1.2             # via -r requirements.in, mozilla-django-oidc
+google-auth==1.23.0       # via kubernetes
 gunicorn==20.0.4          # via -r requirements.in
 idna==2.10                # via requests
 josepy==1.4.0             # via mozilla-django-oidc
+kubernetes==12.0.0        # via -r requirements.in
 mozilla-django-oidc==1.2.4  # via -r requirements.in
 oauthlib==3.1.0           # via requests-oauthlib
 psycopg2-binary==2.8.6    # via -r requirements.in
+pyasn1-modules==0.2.8     # via google-auth
+pyasn1==0.4.8             # via pyasn1-modules, rsa
 pycparser==2.20           # via cffi
 pyopenssl==19.1.0         # via josepy
+python-dateutil==2.8.1    # via kubernetes
 pytz==2020.1              # via django
-pyyaml==5.3.1             # via -r requirements.in
-requests-oauthlib==1.3.0  # via -r requirements.in
-requests==2.24.0          # via mozilla-django-oidc, requests-oauthlib
-six==1.15.0               # via cryptography, josepy, mozilla-django-oidc, pyopenssl
+pyyaml==5.3.1             # via -r requirements.in, kubernetes
+requests-oauthlib==1.3.0  # via -r requirements.in, kubernetes
+requests==2.24.0          # via kubernetes, mozilla-django-oidc, requests-oauthlib
+rsa==4.6                  # via google-auth
+six==1.15.0               # via cryptography, google-auth, josepy, kubernetes, mozilla-django-oidc, pyopenssl, python-dateutil, websocket-client
 sqlparse==0.4.1           # via django
-urllib3==1.25.11          # via requests
+urllib3==1.25.11          # via kubernetes, requests
+websocket-client==0.57.0  # via kubernetes
 whitenoise==5.2.0         # via -r requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:

@@ -64,6 +64,11 @@ spec:
             secretKeyRef:
               name: tkgi-ui-secret
               key: TKGI_CA_CERT
+        - name: TKGI_CLUSTER_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: tkgi-ui-secret
+              key: TKGI_CLUSTER_CLIENT_ID
         - name: OIDC_OP_JWKS_ENDPOINT
           valueFrom:
             secretKeyRef:
@@ -94,3 +99,8 @@ spec:
             secretKeyRef:
               name: tkgi-ui-secret
               key: OIDC_OP_USER_ENDPOINT
+        - name: OIDC_AUTH_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: tkgi-ui-secret
+              key: OIDC_AUTH_ENDPOINT
