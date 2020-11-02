@@ -113,6 +113,7 @@ def cluster_refresh(request):
         cluster.last_action_state = current_cluster["last_action_state"]
         cluster.last_action_description = current_cluster["last_action_description"]
         cluster.kubernetes_master_host = current_cluster["parameters"]["kubernetes_master_host"]
+        cluster.kubernetes_master_host = current_cluster["parameters"]["kubernetes_master_port"]
         cluster.save()
       elif(cluster_response.status_code == 404):
         cluster.delete()
@@ -173,6 +174,7 @@ class ClusterCreate(LoginRequiredMixin, CreateView):
           form.instance.last_action_state = current_cluster["last_action_state"]
           form.instance.last_action_description = current_cluster["last_action_description"]
           form.instance.kubernetes_master_host = current_cluster["parameters"]["kubernetes_master_host"]
+          form.instance.kubernetes_master_port = current_cluster["parameters"]["kubernetes_master_port"]
           form.instance.uuid = current_cluster["uuid"]
           form.instance.plan_name = current_cluster["plan_name"]
           return super().form_valid(form)
