@@ -1,4 +1,4 @@
 {% extends 'webapp/base.html' %}
 {% block content %}
-  <p>Welcome!<p>
+  <p>Welcome {{ request.user.email }}!<p>
 {% endblock %}
