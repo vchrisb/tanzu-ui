@@ -6,7 +6,7 @@ A Proof of Concept for a custom TKGi UI
 
 https://github.com/int128/kubelogin
 
-'''
+```
 # Homebrew (macOS and Linux)
 brew install int128/kubelogin/kubelogin
 
@@ -15,8 +15,7 @@ kubectl krew install oidc-login
 
 # Chocolatey (Windows)
 choco install kubelogin
-''' 
-
+```
 
 ## TKGi preparation
 
