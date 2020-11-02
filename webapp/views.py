@@ -79,7 +79,7 @@ def create_cluster_role_binding(email, cluster):
           if (len(existing_role_binding.items) == 0):
             metadata = kubernetes.client.V1ObjectMeta(name=role_binding_name)
             role_ref = kubernetes.client.V1RoleRef(api_group='rbac.authorization.k8s.io', kind='ClusterRole', name='cluster-admin')
-            subject = kubernetes.client.V1Subject(kind='User', name='steve@datev.de')
+            subject = kubernetes.client.V1Subject(kind='User', name=email)
             role_binding = kubernetes.client.V1RoleBinding(metadata=metadata, role_ref=role_ref, subjects=[subject])
             api_response = api_instance.create_cluster_role_binding(body=role_binding)
             print('Cluster Role Binding {} created!'.format(role_binding_name))
