@@ -157,3 +157,6 @@ TKGI_API_URL = env('TKGI_API_URL')
 TKGI_CA_CERT = env('TKGI_CA_CERT')
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# correct header for nginx ingreess
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

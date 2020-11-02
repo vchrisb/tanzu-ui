@@ -3,6 +3,16 @@ extraEnv: |
     value: admin
   - name: KEYCLOAK_PASSWORD
     value: Passw0rd
-
+  - name: PROXY_ADDRESS_FORWARDING
+    value: "true"
 service:
-  type: LoadBalancer
+  type: ClusterIP
+
+ingress:
+  enabled: True
+  rules:
+    - host: keycloak.domain.com
+      paths: ["/"]
+  tls:
+    - hosts: ["keycloak.domain.com"]
+      secretName: default-ingress-secret

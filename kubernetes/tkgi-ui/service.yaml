@@ -2,14 +2,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: tkgi-ui
-  labels:
-    app: tkgi-ui
 spec:
-  ports:
-    - name: web
-      port: 80
-      protocol: TCP
-      targetPort: 8080
-  type: LoadBalancer
   selector:
     app: tkgi-ui
+  ports:
+    - name: web
+      protocol: TCP
+      port: 8080
