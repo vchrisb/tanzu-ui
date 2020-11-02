@@ -40,7 +40,7 @@ contexts:
     cluster: {3}
     user: oidc
   name: {3}
-current-context: test2
+current-context: {3}
 kind: Config
 users:
 - name: oidc
@@ -113,7 +113,7 @@ def cluster_refresh(request):
         cluster.last_action_state = current_cluster["last_action_state"]
         cluster.last_action_description = current_cluster["last_action_description"]
         cluster.kubernetes_master_host = current_cluster["parameters"]["kubernetes_master_host"]
-        cluster.kubernetes_master_host = current_cluster["parameters"]["kubernetes_master_port"]
+        cluster.kubernetes_master_port = current_cluster["parameters"]["kubernetes_master_port"]
         cluster.save()
       elif(cluster_response.status_code == 404):
         cluster.delete()
