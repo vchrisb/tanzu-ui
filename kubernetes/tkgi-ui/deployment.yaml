@@ -69,6 +69,11 @@ spec:
             secretKeyRef:
               name: tkgi-ui-secret
               key: TKGI_CLUSTER_CLIENT_ID
+        - name: TKGI_CLUSTER_BASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: tkgi-ui-secret
+              key: TKGI_CLUSTER_BASE_URL
         - name: OIDC_OP_JWKS_ENDPOINT
           valueFrom:
             secretKeyRef:

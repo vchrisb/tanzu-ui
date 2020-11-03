@@ -159,7 +159,7 @@ class ClusterCreate(LoginRequiredMixin, CreateView):
         content = {
           'name': form.instance.name,
           'parameters': {
-            'kubernetes_master_host': "{}.cluster.pks.colton.cf-app.com".format(form.instance.name),
+            'kubernetes_master_host': "{}.{}".format(form.instance.name, settings.TKGI_CLUSTER_BASE_URL),
             'kubernetes_master_port': 8443
           },
           'plan_name': 'small',
@@ -179,6 +179,7 @@ class ClusterCreate(LoginRequiredMixin, CreateView):
           form.instance.plan_name = current_cluster["plan_name"]
           return super().form_valid(form)
         else:
+          print(cluster_response.content)
           form.add_error('name', "Failed to create cluster")
           return super().form_invalid(form)
 

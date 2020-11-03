@@ -19,3 +19,5 @@ kubectl apply -k ./
 # apply django database migration
 kubectl exec -it tkgi-ui-6bcc45f7c8-md8zq -- python manage.py migrate
 ```
+
+`Pks Uaa Management Admin Client` can be used for `TKGI_CLIENT_SECRET`
