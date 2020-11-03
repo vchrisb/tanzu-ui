@@ -7,8 +7,13 @@ helm upgrade keycloak codecentric/keycloak -f values.yaml
 * Create user with email address and enable "Email Verified"
 * set password
 
-## Client
+## Client for UI
 
 * Create new client with openid-connect
 * set Access Type to "confidential"
-* configure Redirec URL `http://127.0.0.1:8000/oidc/callback/`
+* configure Redirec URL `https://<tkgi-u>/oidc/callback/`
+
+## Client for kubelogin
+
+* Create new client with openid-connect
+* configure Redirec URL `http://localhost:8000` and `http://localhost:18000`
