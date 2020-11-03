@@ -17,7 +17,10 @@ class Cluster(models.Model):
     last_action_description = models.CharField(max_length=200)
     kubernetes_master_host = models.CharField(max_length=200)
     kubernetes_master_port = models.IntegerField()
-    pks_version = models.CharField(max_length=30, blank=True)
+    kubernetes_master_ip = models.CharField(max_length=20, blank=True)
+    kubernetes_worker_instances = models.IntegerField()
+    k8s_version = models.CharField(max_length=30)
+
 
     def __str__(self):
         return self.name
