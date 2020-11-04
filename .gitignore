@@ -133,3 +133,4 @@ tkgi.sh
 
 db.sqlite3
 secrets.env
+staticfiles
