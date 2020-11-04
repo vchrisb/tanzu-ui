@@ -28,6 +28,7 @@
             <td>{{cluster.last_action_state}}</td>
             <td>
               {% if  cluster.last_action == "CREATE" and cluster.last_action_state == "in progress" %}
+              {% elif  cluster.last_action == "DELETE" and cluster.last_action_state == "in progress" %}
               {% else %}
                 <a href="{% url 'cluster_kubeconfig' cluster.uuid %}" download><button type="button" class="btn btn-primary"><i class="fas fa-download"></i></button></a>
                 <a href="{% url 'cluster_delete' cluster.uuid %}" ><button type="button" class="btn btn-danger"><i class="far fa-trash-alt"></i></button></a>

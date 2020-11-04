@@ -54,7 +54,7 @@ users:
       - --oidc-client-id={5}
       command: kubectl
       env: null
-'''.format(settings.TKGI_CA_CERT, cluster.kubernetes_master_host, cluster.kubernetes_master_port, cluster.name, settings.OIDC_AUTH_ENDPOINT, settings.TKGI_CLUSTER_CLIENT_ID)
+'''.format(settings.TKGI_CA_CERT, cluster.kubernetes_master_ip, cluster.kubernetes_master_port, cluster.name, settings.OIDC_AUTH_ENDPOINT, settings.TKGI_CLUSTER_CLIENT_ID)
         response = HttpResponse(content, content_type='text/plain; charset=utf8')
         response['Content-Disposition'] = 'attachment; filename="kubeconfig"'
         return response
@@ -70,6 +70,8 @@ def create_cluster_role_binding(email, cluster):
     role_binding_name = email.replace('@','__') + '-cluster-admin'
     if(cluster_response.status_code == 200):
       kubeconfig = cluster_response.json()
+      # use IP address instead of dns to connect to cluster
+      kubeconfig['clusters'][0]['cluster']['server'] = "https://{}:{}".format(cluster.kubernetes_master_ip, cluster.kubernetes_master_port)
       kubernetes.config.load_kube_config_from_dict(kubeconfig)
       with kubernetes.client.ApiClient() as api_client:
         api_instance = kubernetes.client.RbacAuthorizationV1Api(api_client)

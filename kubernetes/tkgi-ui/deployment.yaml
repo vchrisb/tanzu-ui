@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: tkgi-ui
-        image: vchrisb/tkgi-ui:latest
+        image: ghcr.io/vchrisb/tkgi-ui:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

@@ -4,6 +4,7 @@ helm upgrade keycloak codecentric/keycloak -f values.yaml
 # Configure
 
 ## User
+
 * Create user with email address and enable "Email Verified"
 * set password
 
@@ -19,10 +20,9 @@ helm upgrade keycloak codecentric/keycloak -f values.yaml
 * configure Redirec URL `http://localhost:8000` and `http://localhost:18000`
 
 
+## Azure Federation
 
-### Azure Federation
-
-#### Azure
+### Azure
 
 * create new Enterprise Application in Azure Active Directory
 * disable `User assignment required` in Application Properties
@@ -31,7 +31,7 @@ helm upgrade keycloak codecentric/keycloak -f values.yaml
 Identifier: https://keycloak.domain.com/auth/realms/master
 Reply URL: https://keycloak.domain.com/auth/realms/master/broker/<IDP alias>/endpoint
 
-#### Keycloak
+### Keycloak
 
 * create new IDP
 * Alias: `azure`
@@ -49,3 +49,9 @@ Reply URL: https://keycloak.domain.com/auth/realms/master/broker/<IDP alias>/end
   * Mapper Type: `Attribute Importer`
   * Attribute Name: `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname`
   * User Attribute Name: `firstName`
+
+## Usage
+
+### Manual Log Out
+
+`https://keycloak.domain.com/auth/realms/master/protocol/openid-connect/logout`
