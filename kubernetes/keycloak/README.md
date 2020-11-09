@@ -49,7 +49,9 @@ Reply URL: https://keycloak.domain.com/auth/realms/master/broker/<IDP alias>/end
   * Mapper Type: `Attribute Importer`
   * Attribute Name: `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname`
   * User Attribute Name: `firstName`
-
+* Create Mapper for username
+  * Mapper Type: `Username Template Importer`
+  * Template: `${ATTRIBUTE.http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name}`
 ## Usage
 
 ### Manual Log Out

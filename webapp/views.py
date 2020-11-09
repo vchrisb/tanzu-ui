@@ -2,19 +2,23 @@ from django.shortcuts import render, redirect
 from oauthlib.oauth2 import BackendApplicationClient
 from requests_oauthlib import OAuth2Session
 from django.contrib.auth.decorators import login_required
-from .models import Cluster
+from .models import Cluster, Organization
 from django.conf import settings
 from django.views.generic.edit import CreateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.http import HttpResponse
-from .forms import ClusterForm
+from .forms import ClusterForm, OrganizationForm
 import json
 import kubernetes
 from kubernetes.client.rest import ApiException
+import urllib.parse
 
 def index(request):
     return render(request, 'webapp/index.html')
+
+
+### TKGI
 
 @login_required
 def cluster(request):
@@ -195,4 +199,124 @@ def get_request_object():
     client = BackendApplicationClient(client_id=settings.TKGI_CLIENT_ID)
     oauth = OAuth2Session(client=client)
     token = oauth.fetch_token(token_url=token_url, client_id=settings.TKGI_CLIENT_ID, client_secret=settings.TKGI_CLIENT_SECRET)
+    return oauth
+
+### TAS
+
+@login_required
+def organization(request):
+    organizations = Organization.objects.filter(owner=request.user)
+    context = {
+        'api_url': "https://console.{}".format(settings.TAS_SYS_URL),
+        'organizations': organizations,
+    }
+    return render(request, 'webapp/organization.html', context)
+
+class OrganizationCreate(LoginRequiredMixin, CreateView):
+    model = Organization
+    fields = ['name']
+    template_name = 'webapp/organization_create.html'
+    success_url = reverse_lazy("organization")
+
+    def form_valid(self, form):
+        oauth = get_request_object_tas()
+        
+        try: 
+          # create user
+          user_response = oauth.get("https://uaa.{}/Users?filter=userName+eq+%22{}%22+and+origin+eq+%22{}%22".format(settings.TAS_SYS_URL, self.request.user.email, settings.TAS_ORIGIN))
+          if(user_response.status_code == 200):
+            user = user_response.json()
+            if (user["totalResults"] == 0):
+              content = {
+                "emails": [
+                  {
+                    "primary": "true",
+                    "value": self.request.user.email
+                  }
+                ],
+                "name": {
+                  "familyName": self.request.user.email,
+                  "givenName": self.request.user.email
+                },
+                "origin": settings.TAS_ORIGIN,
+                "password": "[PRIVATE DATA HIDDEN]",
+                "userName": self.request.user.email
+              }
+              user_response = oauth.post("https://uaa.{}/Users".format(settings.TAS_SYS_URL, settings.TAS_ORIGIN),json=content)
+              if(user_response.status_code != 201):
+                Exception('Could not create User')
+          else:
+            Exception('Response for getting users not 200')
+
+          # create organization
+          content = {
+          'name': form.instance.name,
+          }
+          org_response = oauth.post("https://api.{}/v3/organizations".format(settings.TAS_SYS_URL),json=content)
+          print(org_response.content)
+          if(org_response.status_code != 201):
+            Exception('Could not create organization')
+          org_guid = org_response.json()["guid"]
+          # create role
+          content = {
+                "type": "organization_manager",
+                "relationships": {
+                  "user": {
+                    "data": {
+                      "username": self.request.user.email
+                    }
+                  },
+                  "organization": {
+                    "data": {
+                      "guid": org_guid
+                    }
+                  }
+                }
+          }
+          role_response = oauth.post("https://api.{}/v3/roles".format(settings.TAS_SYS_URL),json=content)
+          if(role_response.status_code != 201):
+            Exception('Could not create role')
+
+          form.instance.owner = self.request.user
+          form.instance.uuid = org_guid
+          return super().form_valid(form)
+        except:
+          print("Error in OrganizationCreate")
+          raise
+          form.add_error('name', "Failed to create organization")
+          return super().form_invalid(form)
+
+@login_required
+def organization_delete(request, pk=None):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = OrganizationForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            organization = Organization.objects.filter(owner=request.user).filter(uuid=pk).first()
+            if(organization):
+              oauth = get_request_object_tas()
+              org_response = oauth.delete("https://api.{}/v3/organizations/{}".format(settings.TAS_SYS_URL, organization.uuid))
+              if(org_response.status_code == 202):
+                # delete in db
+                organization.delete()
+                # redirect to a new URL:
+                return redirect("organization")
+              else:
+                error = "Error deleting Organization {}".format(pk)
+            else:
+              error = "Organization {} not found or does not belong to user".format(pk)
+            return render(request, 'webapp/error.html', {'error': error})
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = OrganizationForm({'uuid': pk})
+
+    return render(request, 'webapp/organization_delete.html', {'form': form})
+
+def get_request_object_tas():
+    token_url = "https://uaa.{}/oauth/token".format(settings.TAS_SYS_URL)
+    client = BackendApplicationClient(client_id=settings.TAS_CLIENT_ID)
+    oauth = OAuth2Session(client=client)
+    token = oauth.fetch_token(token_url=token_url, client_id=settings.TAS_CLIENT_ID, client_secret=settings.TAS_CLIENT_SECRET)
     return oauth

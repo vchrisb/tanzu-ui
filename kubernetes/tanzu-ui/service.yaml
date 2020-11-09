@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: tkgi-ui
+  name: tanzu-ui
 spec:
   selector:
-    app: tkgi-ui
+    app: tanzu-ui
   ports:
     - name: web
       protocol: TCP

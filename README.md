@@ -1,6 +1,6 @@
-# tkgi-ui
+# tanzu-ui
 
-A Proof of Concept for a custom TKGi UI
+A Proof of Concept for a custom Tanzu UI
 
 ## Client requirements
 

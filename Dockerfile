@@ -7,7 +7,7 @@ WORKDIR $APP_HOME
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
 COPY manage.py .
-COPY tkgi ./tkgi
+COPY tanzu ./tanzu
 COPY webapp ./webapp
 
 ENV PYTHONUNBUFFERED TRUE

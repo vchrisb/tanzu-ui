@@ -30,3 +30,17 @@ class Cluster(models.Model):
 
     def __str__(self):
         return self.name
+
+# Create your models here.
+class Organization(models.Model):
+    """
+    A model which holds information about a particular Organization
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    name = models.SlugField(max_length=32, unique=True)
+    uuid = models.UUIDField()
+
+    def __str__(self):
+        return self.name

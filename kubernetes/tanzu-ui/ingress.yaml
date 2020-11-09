@@ -1,19 +1,19 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: tkgi-ui
+  name: tanzu-ui
   labels:
-    app: tkgi-ui
+    app: tanzu-ui
 spec:
   tls:
   - hosts:
-    - tkgi-ui.domain.com
+    - ui.domain.com
     secretName: default-ingress-secret
   rules:
-  - host: tkgi-ui.domain.com
+  - host: ui.domain.com
     http:
       paths:
       - path: /
         backend:
-          serviceName: tkgi-ui
+          serviceName: tanzu-ui
           servicePort: web
