@@ -30,7 +30,7 @@ spec:
               name: tanzu-postgresql
               key: postgresql-password
         - name: DATABASE_URL
-          value: postgres://postgres:$(POSTGRESQL_PASSWORD)@tanzu-postgresql-headless.default.svc.cluster.local:5432/postgres
+          value: postgres://postgres:$(POSTGRESQL_PASSWORD)@tanzu-postgresql-headless.default.svc.cluster.local:5432/tanzu-ui
         - name: DEBUG
           valueFrom:
             secretKeyRef:
